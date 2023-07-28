@@ -10,21 +10,24 @@ services:
       - 8000:8000
     image: test_django
     container_name: test_django_container
-    command: "python3 manage.py runserver 0.0.0.0:8000"
+    command: bash -c " if [ ! -d "django_api_one" ]; then django-admin startproject django_api_one; fi && cd django_api_one && if [ ! -d "profiles_api" ]; then python3 manage.py startapp profiles_api; fi && python3 manage.py runserver 0.0.0.0:8000 "
     restart: always
-    # depends_on:
-    #   - db
+    depends_on:
+      - db
 
-    # db:
-    #   image: postgres
-    #   volumes:
-    #     - ./data/db:/var/lib/postgresql/data
-    #   environment:
-    #     - POSTGRES_DB=postgres
-    #     - POSTGRES_USER=postgres
-    #     - POSTGRES_PASSWORD=postgres
-    #   container_name: postgres_db
-    #   restart: always
+  db:
+    image: postgres
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    container_name: postgres_db
+    restart: always
+
+volumes:
+  db_volume:
 
     # redis:
     #   image: redis:alpine
